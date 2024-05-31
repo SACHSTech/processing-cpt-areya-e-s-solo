@@ -15,7 +15,14 @@ public class Sketch extends PApplet {
   PImage imgCharacter1;
   PImage imgCharacter2;
   PImage imgCharacter3;
+  PImage imgnotePad;
+  PImage imgCheese;
   int intScreen = 0;
+
+  // Which customer was pciked?
+  boolean Character1picked = false;
+  boolean Character2picked = false;
+  boolean Character3picked = false;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -113,6 +120,14 @@ public class Sketch extends PApplet {
     imgCharacter3.resize(300, 400);
 
     // Load image of notepad 
+    imgnotePad = loadImage("/Images/notePad.png");
+    // Resize to fit screen
+    imgnotePad.resize(400, 500);
+
+    // Load image of chesse
+    imgCheese = loadImage("/Images/Cheese.png");
+    // Resize to fit screen 
+    imgCheese.resize(60, 70);
     
   }
 
@@ -123,13 +138,17 @@ public class Sketch extends PApplet {
     image(imgStart, 150, 225);
     image(imgTutorial, 150, 310);
     image(imgGallery, 150, 385);
-    image(imgBy, 60, 480);
+    image(imgBy, 50, 470);
   }
 
   public void mouseClicked(){
     // Was start button pressed?
-    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 375){
+    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 325){
       intScreen = 1;
+    }
+    if (mouseX >= 325 && mouseX <= 405){
+      Character1picked = true;
+      System.out.println("HELLO");
     }
   }
 
@@ -138,5 +157,23 @@ public class Sketch extends PApplet {
     image(imgCharacter1, 325, 99);
     image(imgCharacter2, 480, 80);
     image(imgCharacter3, 680, 85);
+
+    // Bring out notepad
+    if (mouseX >= 800 && mouseY >= 150){
+      image(imgnotePad, 520, 125);
+    }
+    else{
+      image(imgnotePad, 730, 125);
+    }
+    image(imgCheese, 285, 365);
+
+    // Which character was selected?
+    if (Character1picked){
+      // DO THIS
+    }
+  }
+
+  public void mouseDragged(){
+    // Drag ingredients into the notepad
   }
 }
