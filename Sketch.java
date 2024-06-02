@@ -16,13 +16,27 @@ public class Sketch extends PApplet {
   PImage imgCharacter2;
   PImage imgCharacter3;
   PImage imgnotePad;
-  PImage imgCheese;
+  PImage imgPaused;
   int intScreen = 0;
+
+  // Load Images of pizza toppings
+  PImage imgBasil;
+  PImage imgPizzaCrust;
+  PImage imgCheese;
+  PImage imgMushroom;
+  PImage imgOlives;
+  PImage imgPepers;
+  PImage imgPepperoni;
+  PImage imgPineapple;
+  PImage imgSause;
 
   // Which customer was pciked?
   boolean Character1picked = false;
   boolean Character2picked = false;
   boolean Character3picked = false;
+
+  // Which screen is being shown?
+  boolean displayPauseScreen = false;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -50,84 +64,111 @@ public class Sketch extends PApplet {
    */
   public void draw() {
     
-    /*
+    ///*
     if(intScreen == 0){
       welcomeScreen();
     }
     if (intScreen == 1){
       takeOrder();
     }
-    */
+    if (displayPauseScreen){
+      pauseScreen();
+    }
+    //*/
 
-    takeOrder();
   }
 
   public void loadImages(){
     
     // Load Exterior of Dinner
     imgExterior = loadImage("/Images/Diner_exteriorFull.png");
-    // Resize to fit screen
     imgExterior.resize(width, height);
 
     // Load welcome sign
     imgWelcome = loadImage("/Images/Welcome to.png");
-    // Resize to fit screen
     imgWelcome.resize(300, 200);
 
     // Load logo 
     imgLogo = loadImage("/Images/PizzaliciousLogo.png");
-    // Resize to fit screen 
     imgLogo.resize(200, 130);
 
     // Load Start Button
     imgStart = loadImage("/Images/Start_button.png");
-    // Resize to fit screen
     imgStart.resize(250, 150);
 
     // Load tutorial button
     imgTutorial = loadImage("/Images/tutorial button.png");
-    // Resize tutorial button 
     imgTutorial.resize(200, 100);    
 
     // Load Gallery button
     imgGallery = loadImage("/Images/Gallery_button.png");
-    // Resize to fit screen
     imgGallery.resize(200, 100);
 
     // Load by Areya E-S
     imgBy = loadImage("/Images/byAES.png");
-    // Resize to fit screen
     imgBy.resize(200, 100);
+
+    // Load paused screen
+    imgPaused = loadImage("/Images/paused screen.png");
+    imgPaused.resize(250, 275);
 
     // Load order station
     imgOrderStation = loadImage("/Images/orderStation.png");
-    // Resize to fit screen
     imgOrderStation.resize(width, height);
 
     // Load the first character
     imgCharacter1 = loadImage("/Images/Character1.png");
-    // Resize to fit screen
     imgCharacter1.resize(300, 400);
 
     // Load Second character
     imgCharacter2 = loadImage("/Images/Character2.png");
-    // Resize to fit screen
     imgCharacter2.resize(300, 405);
 
     // Load third Character
     imgCharacter3 = loadImage("/Images/Character3.png");
-    // Resize to fit screen 
     imgCharacter3.resize(300, 400);
 
     // Load image of notepad 
     imgnotePad = loadImage("/Images/notePad.png");
-    // Resize to fit screen
-    imgnotePad.resize(400, 500);
+    imgnotePad.resize(400, 500);    
+  }
+
+  public void loadIngredients(){
+    // Load image of pizza crust 
+    imgPizzaCrust = loadImage("/Ingredients/Pizza Crust.png");
+    imgPizzaCrust.resize(110, 30);
 
     // Load image of chesse
-    imgCheese = loadImage("/Images/Cheese.png");
-    // Resize to fit screen 
+    imgCheese = loadImage("/Ingredients/Cheese.png");
     imgCheese.resize(60, 70);
+
+    // Load image of basil 
+    imgBasil = loadImage("/Ingredients/Basil.png");
+    imgBasil.resize(60, 70);
+
+    // Load image of mushroom 
+    imgMushroom = loadImage("/Ingredients/Mushroom.png");
+    imgMushroom.resize(60, 70);
+
+    // Load image of olive
+    imgOlives = loadImage("/Ingredients/Olives.png");
+    imgOlives.resize(60, 70);
+
+    // Load image of pepers
+    imgPepers = loadImage("/Ingredients/pepers.png");
+    imgPepers.resize(60, 70);
+
+    // Load image of peperonie
+    imgPepperoni = loadImage("/Ingredients/pepperoni.png");
+    imgPepperoni.resize(60, 70);
+
+    // Load image of pineapple
+    imgPineapple = loadImage("/Ingredients/Pineapple.png");
+    imgPineapple.resize(60, 70);
+
+    // Load image of sause
+    imgSause = loadImage("/Ingredients/Sause");
+    imgSause.resize(60, 70);
     
   }
 
@@ -141,15 +182,11 @@ public class Sketch extends PApplet {
     image(imgBy, 50, 470);
   }
 
-  public void mouseClicked(){
-    // Was start button pressed?
-    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 325){
-      intScreen = 1;
-    }
-    if (mouseX >= 325 && mouseX <= 405){
-      Character1picked = true;
-      System.out.println("HELLO");
-    }
+  public void pauseScreen(){
+    background(imgExterior);
+    image(imgLogo, 150, 80);
+    image(imgPaused, 140, 220);
+    // DO COLLISION
   }
 
   public void takeOrder(){
@@ -176,4 +213,25 @@ public class Sketch extends PApplet {
   public void mouseDragged(){
     // Drag ingredients into the notepad
   }
+
+  public void mouseClicked(){
+    // Was start button pressed?
+    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 300){
+      intScreen = 1;
+    }
+    if (mouseX >= 325 && mouseX <= 405){
+      Character1picked = true;
+    }
+  }
+
+  public void keyPressed(){
+    if (key == 'x'){
+      displayPauseScreen = true;
+    }
+  }
+
+  public void kitchen(){
+
+  }
+
 }
