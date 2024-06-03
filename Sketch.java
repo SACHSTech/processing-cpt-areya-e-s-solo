@@ -56,6 +56,7 @@ public class Sketch extends PApplet {
     background(0);
 
     loadImages();
+    //loadIngredients();
     
   }
 
@@ -71,10 +72,13 @@ public class Sketch extends PApplet {
     if (intScreen == 1){
       takeOrder();
     }
+    /*
     if (displayPauseScreen){
       pauseScreen();
     }
-    //*/
+    */
+
+    welcomeScreen();
 
   }
 
@@ -137,15 +141,15 @@ public class Sketch extends PApplet {
     // Load image of pizza crust 
     imgPizzaCrust = loadImage("/Ingredients/Pizza Crust.png");
     imgPizzaCrust.resize(110, 30);
-
+    
     // Load image of chesse
     imgCheese = loadImage("/Ingredients/Cheese.png");
     imgCheese.resize(60, 70);
-
+    
     // Load image of basil 
     imgBasil = loadImage("/Ingredients/Basil.png");
     imgBasil.resize(60, 70);
-
+    
     // Load image of mushroom 
     imgMushroom = loadImage("/Ingredients/Mushroom.png");
     imgMushroom.resize(60, 70);
@@ -159,7 +163,7 @@ public class Sketch extends PApplet {
     imgPepers.resize(60, 70);
 
     // Load image of peperonie
-    imgPepperoni = loadImage("/Ingredients/pepperoni.png");
+    imgPepperoni = loadImage("/Ingredients/Pepperoni.png");
     imgPepperoni.resize(60, 70);
 
     // Load image of pineapple
@@ -167,7 +171,7 @@ public class Sketch extends PApplet {
     imgPineapple.resize(60, 70);
 
     // Load image of sause
-    imgSause = loadImage("/Ingredients/Sause");
+    imgSause = loadImage("/Ingredients/Sause.png");
     imgSause.resize(60, 70);
     
   }
