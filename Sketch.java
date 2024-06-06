@@ -70,8 +70,9 @@ public class Sketch extends PApplet {
     boolean drawSause;
 
   // Ingredient variables 
-  int[] whichFruits = new int[6];
+  PImage[] drawIngredientImages = new PImage[8];
   float[] xValueOfFruits = new float[8];
+  //float[] yValueofFruit = new float[8];
   int xPizzaValue = 320;
   boolean movePizzaRight = false;
   boolean movePizzaLeft = false;
@@ -109,11 +110,6 @@ public class Sketch extends PApplet {
     loadImages();
     loadIngredients();
 
-    // Determine the x-values for all fo the fruits
-    for (int i = 0; i < xValueOfFruits.length; i++){
-      xValueOfFruits[i] = random(width);
-    }
-
   }
 
   /**
@@ -121,6 +117,7 @@ public class Sketch extends PApplet {
    */
   public void draw() {
     
+    /*
     if(intScreen == 0){
       welcomeScreen();
     }
@@ -135,7 +132,8 @@ public class Sketch extends PApplet {
     if (dipslayKitchen){
       kitchen();
     }
-    
+    */
+    kitchen();
   }
 
   public void loadImages(){
@@ -198,6 +196,8 @@ public class Sketch extends PApplet {
   }
 
   public void loadIngredients(){
+    // I THINK YOU CAN DELETE THIS 
+    /*
     // Load image of pizza crust 
     imgPizzaCrust = loadImage("/Ingredients/Pizza Crust.png");
     imgPizzaCrust.resize(330, 200);
@@ -233,7 +233,21 @@ public class Sketch extends PApplet {
     // Load image of sause
     imgSause = loadImage("/Ingredients/Sause.png");
     imgSause.resize(60, 70);
-    
+    */
+
+    // Assign fuirts a place in the array
+    drawIngredientImages[0] = loadImage("/Ingredients/Cheese.png");
+    drawIngredientImages[1] = loadImage("/Ingredients/Basil.png");
+    drawIngredientImages[2] = loadImage("/Ingredients/Mushroom.png");
+    drawIngredientImages[3] = loadImage("/Ingredients/Olives.png");
+    drawIngredientImages[4] = loadImage("/Ingredients/peppers.png");
+    drawIngredientImages[5] = loadImage("/Ingredients/Pepperoni.png");
+    drawIngredientImages[6] = loadImage("/Ingredients/Pineapple.png");
+    drawIngredientImages[7] = loadImage("/Ingredients/Sause.png");
+
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      drawIngredientImages[i].resize(60, 70);
+    }
   }
 
   public void welcomeScreen(){
@@ -333,20 +347,33 @@ public class Sketch extends PApplet {
       movePizzaLeft = true;
     }
 
+    // Fix this
+    // Determine the x-values for all fo the fruits
+  for (int i = 0; i < xValueOfFruits.length; i++){
+    xValueOfFruits[i] = random(width);
+  }
+
+  for (int i = 0; i < drawIngredientImages.length; i++){
+    image(drawIngredientImages[i], xValueOfFruits, (float)random(4));
+  }
+
+
+    /*
     // FINNISH THIS 
     // Make it rain fruit!
-    for (int i = 0; i < height; i+=2){
-      if (drawBasil){
-        image(imgBasil, xValueOfFruits[intBasil], i);
-      }
-      if (drawCheese){
-        image(imgCheese, xValueOfFruits[intCheese], i);
-      }
-      if (drawMushroom){
-        image(imgMushroom, xValueOfFruits[intMushroom], i);
-      }
-    }
+    for (int i = 0; i < yValueofFruit.length; i++){
 
+    }
+    if (drawBasil){
+      image(imgBasil, xValueOfFruits[intBasil], yValueofFruit);
+    }
+    if (drawCheese){
+      image(imgCheese, xValueOfFruits[intCheese], yValueofFruit);
+    }
+    if (drawMushroom){
+      image(imgMushroom, xValueOfFruits[intMushroom], i);
+    }
+    
     // Choose a fruit number 
     for (int i = 0; i < whichFruits.length; i++){
       if (i == intBasil){
@@ -374,6 +401,7 @@ public class Sketch extends PApplet {
         drawSause = true;
       }
     }
+    */
 
     /*
     // Give each fruit a random number
