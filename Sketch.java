@@ -8,15 +8,19 @@ public class Sketch extends PApplet {
 	
   /*
    * NOTE TO SELF 
-   * CHEESE IMAGE GIVING ISSUES 
+   * GET THE INGREDIENTS TO DRAG INOT THE NOTE PAD
+   * fill out gallery thing
    * make it so that you can press a button (displayed on screen) and move to diffrent page
-   * make it do that you have to pass the firt bit befofre you can jump around 
-   *   ArrayList<Integer> whichFruits = new ArrayList<Integer>();
+   * do collision for pause screen 
+   * do tutorial screen 
+   * do gallery screen
+   * make it so that you can't pick on the other character until you pass the level
+   * fix adding fruit to the notepad
    * Show numbers counting down using startCountdown
    *      if (dipslayKitchen && key == ENTER){
       startCountdown = millis();
+      
     }
-
    */
 
    Random myRandom = new Random();
@@ -36,6 +40,7 @@ public class Sketch extends PApplet {
   PImage imgnotePad;
   PImage imgPaused;
   PImage imgKitchen;
+  PImage imgThoughtBubble;
   int intScreen = 0;
 
   // Load Images of pizza toppings
@@ -54,21 +59,28 @@ public class Sketch extends PApplet {
   boolean movePizzaRight = false;
   boolean movePizzaLeft = false;
   PImage[] drawIngredientImages = new PImage[8];
+  PImage[] drawThoughts = new PImage[8];
   float[] xValueOfFruits = new float[8];
   float[] yValueOfFruits = new float[8];
   float [] speedOfFruits = new float[8];
+  float[] fruitinCabinateX = new float[8];
+  float[] fruitinCabinateY = new float[8];
 
   // Which customer was picked?
   boolean Character1picked = false;
   boolean Character2picked = false;
   boolean Character3picked = false;
 
+  // Order Variables
+  float[] order1 = new float[4];
+
   // Which screen is being shown?
   boolean displayPauseScreen = false;
   boolean dipslayKitchen = false;
 
   // Count down variables
-  int startCountdown;
+  int timerMIN = 0;
+  int timerSEC = 0;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -96,11 +108,42 @@ public class Sketch extends PApplet {
       xValueOfFruits[i] = random(width);
     }
 
-      // Determine how fast each fruit will fall
-     for (int i = 0; i < speedOfFruits.length; i++){
-        speedOfFruits[i] = (float)random(6);
-      }
+    // Determine how fast each fruit will fall
+    for (int i = 0; i < speedOfFruits.length; i++){
+      speedOfFruits[i] = (float)random(6);
+    }
+    
+    // Set the x values of fruit in the take out order method
+    fruitinCabinateX[0] = 290;
+    fruitinCabinateX[1] = 370;
+    fruitinCabinateX[2] = 290;
+    fruitinCabinateX[3] = 370;
+    fruitinCabinateX[4] = 520;
+    fruitinCabinateX[5] = 600;
+    fruitinCabinateX[6] = 520;
+    fruitinCabinateX[7] = 600;
 
+    // Set the y values of fruit in the take out order method 
+    fruitinCabinateY[0] = 360;
+    fruitinCabinateY[1] = 360;
+    fruitinCabinateY[2] = 435;
+    fruitinCabinateY[3] = 435;
+    fruitinCabinateY[4] = 360;
+    fruitinCabinateY[5] = 360;
+    fruitinCabinateY[6] = 435;
+    fruitinCabinateY[7] = 435;
+
+    // Randomize the first order
+    for (int i = 0; i < order1.length; i++){
+        order1[i] = random(8);
+        if(i >= 1){
+          for (int j = 0; i < order1.length; i++){
+            if (order1[i] == order1[i - 1]){
+              order1[i] = random(8);
+            }
+          }
+        }
+    }
   }
 
   /**
@@ -108,7 +151,6 @@ public class Sketch extends PApplet {
    */
   public void draw() {
     
-  ///*
     if(intScreen == 0){
       welcomeScreen();
     }
@@ -123,8 +165,8 @@ public class Sketch extends PApplet {
     if (dipslayKitchen){
       kitchen();
     }
-    //*/
-    //kitchen();
+    
+    startCountdownandPoints();
   }
 
   public void loadImages(){
@@ -184,6 +226,11 @@ public class Sketch extends PApplet {
     // Load image of Kitchen
     imgKitchen = loadImage("/Images/KitchenFull.png");
     imgKitchen.resize(width, height);
+
+    // Load thought bubble
+    imgThoughtBubble = loadImage("/Images/ThoughtBubble.png");
+    imgThoughtBubble.resize(300, 250);
+
   }
 
   public void loadIngredients(){
@@ -204,6 +251,21 @@ public class Sketch extends PApplet {
 
     for (int i = 0; i < drawIngredientImages.length; i++){
       drawIngredientImages[i].resize(60, 70);
+    }
+
+    // Assign fruits in the array - drawThoughts
+    drawThoughts[0] = loadImage("/Ingredients/Cheese.png");
+    drawThoughts[1] = loadImage("/Ingredients/Basil.png");
+    drawThoughts[2] = loadImage("/Ingredients/Mushroom.png");
+    drawThoughts[3] = loadImage("/Ingredients/Olives.png");
+    drawThoughts[4] = loadImage("/Ingredients/peppers.png");
+    drawThoughts[5] = loadImage("/Ingredients/Pepperoni.png");
+    drawThoughts[6] = loadImage("/Ingredients/Pineapple.png");
+    drawThoughts[7] = loadImage("/Ingredients/Sause.png");
+
+
+    for(int i = 0; i < drawThoughts.length; i++){
+      drawThoughts[i].resize(30, 40);
     }
   }
 
@@ -231,32 +293,102 @@ public class Sketch extends PApplet {
     image(imgCharacter3, 680, 85);
 
     // Bring out notepad
-    if (mouseX >= 800 && mouseY >= 150){
-      image(imgnotePad, 520, 125);
+    if (mouseX <= 60 && mouseY >= 150){
+      image(imgnotePad, -75, 125);
     }
     else{
-      image(imgnotePad, 730, 125);
+      image(imgnotePad, -250, 125);
     }
-    /*
-    // Which character was selected?
+
+    // Draw logo
+    image(imgLogo, 40, 40);
+    
+    // Put fruits in the cabinate
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      image(drawIngredientImages[i], fruitinCabinateX[i], fruitinCabinateY[i]);
+    }
+
     if (Character1picked){
-      // DO THIS
+      image(imgThoughtBubble, 450, 20);
+      for (int i = 0; i < order1.length; i++){
+        image(drawIngredientImages[(int)order1[i]], 505 + i * 50, 55);
+      }
     }
-    */
+  }
+
+  public void kitchen(){
+    background(imgKitchen);
+    image(imgPizzaCrust, xPizzaValue, 420); 
+
+  // Should I move the pizza
+    if (xPizzaValue < 625 && movePizzaRight){
+      xPizzaValue+=2;
+      movePizzaRight = true;
+    }
+    if (xPizzaValue > 5 && movePizzaLeft){
+      xPizzaValue-=2;
+      movePizzaLeft = true;
+    }
+
+    // Determine the x-values for all of fruits if they go off screen
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      if (yValueOfFruits[i] > height){
+        yValueOfFruits[i] = 0;
+        speedOfFruits[i] =  (float)random(4);
+        xValueOfFruits[i] = random(width);
+      }
+    }
+
+    // Draw the furits
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      yValueOfFruits[i] += speedOfFruits[i];
+      image(drawIngredientImages[i], xValueOfFruits[i], yValueOfFruits[i]);
+    }
+
+    // Collision detection
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      if (xValueOfFruits[i] + 60 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 330 && yValueOfFruits[i] + 70 > 430){
+        yValueOfFruits[i] = height + 100;
+      }
+    }
+  }
+
+  public void gallery(){
+    //image()
+  }
+
+  public void startCountdownandPoints(){
+    text("POINTS: ", 40, 60);
+    text(timerMIN, 60, 90);
+    //text(timerSEC, )
+    textSize(20);
+    fill(0,0,0);
   }
 
   public void mouseDragged(){
-    // Drag ingredients into the notepad
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      if (mouseX >= fruitinCabinateX[i] && mouseX <= fruitinCabinateX[i] + 55 && mouseY >= fruitinCabinateY[i] && mouseY <= fruitinCabinateY[i] + 70){
+        fruitinCabinateX[i] += mouseX - pmouseX;
+        fruitinCabinateY[i] += mouseY - pmouseY;
+      }
+      // Should I add this to the notepad?
+      if (fruitinCabinateX[i] <= 60 && fruitinCabinateY[i] >= 150){
+        fruitinCabinateX[i] = 75;
+        fruitinCabinateY[i] = 220;
+      }
+    }
   }
 
   public void mouseClicked(){
     // Was start button pressed?
     if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 300){
       intScreen = 1;
+      timerMIN = minute();
+      timerSEC = second();
     }
 
     // Was the first Character clicked?
-    if (mouseX >= 325 && mouseX <= 405){
+    if (mouseX >= 325 && mouseX <= 450 && mouseY >= 99 && mouseY <= 265){
       Character1picked = true;
     }
   }
@@ -285,41 +417,5 @@ public class Sketch extends PApplet {
     }
   }
 
-  public void kitchen(){
-    background(imgKitchen);
-    image(imgPizzaCrust, xPizzaValue, 420); 
-
-    // Should I move the pizza
-    if (xPizzaValue < 625 && movePizzaRight){
-      xPizzaValue+=2;
-      movePizzaRight = true;
-    }
-    if (xPizzaValue > 5 && movePizzaLeft){
-      xPizzaValue-=2;
-      movePizzaLeft = true;
-    }
-
-    // Fix this
-  // Determine the x-values for all of fruits if they go off screen
-  for (int i = 0; i < drawIngredientImages.length; i++){
-    if (yValueOfFruits[i] > height){
-      yValueOfFruits[i] = 0;
-      speedOfFruits[i] =  (float)random(4);
-      xValueOfFruits[i] = random(width);
-    }
-  }
-
-  // Draw the furits
-  for (int i = 0; i < drawIngredientImages.length; i++){
-    yValueOfFruits[i] += speedOfFruits[i];
-    image(drawIngredientImages[i], xValueOfFruits[i], yValueOfFruits[i]);
-  }
-
-  // Collision detection
-  for (int i = 0; i < drawIngredientImages.length; i++){
-    if ()
-  }
-
-  }
 
 }
