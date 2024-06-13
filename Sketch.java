@@ -1,28 +1,10 @@
 import processing.core.PApplet;
 import processing.core.PImage;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Sketch extends PApplet {
 	
-  /*
-   * NOTE TO SELF 
-   * GET THE INGREDIENTS TO DRAG INOT THE NOTE PAD & if notepad moves left so do the fruits
-   * fill out gallery thing
-   * make it so that you can press a button (displayed on screen) and move to diffrent page
-   * do collision for pause screen 
-   * do tutorial screen 
-   * do gallery screen
-   * make it so that you can't pick on the other character until you pass the level
-   * fix adding fruit to the notepad
-   * Show numbers counting down using startCountdown
-   *      if (dipslayKitchen && key == ENTER){
-      startCountdown = millis();
-      
-    }
-   */
-
    Random myRandom = new Random();
 
   // Import images
@@ -42,7 +24,7 @@ public class Sketch extends PApplet {
   PImage imgKitchen;
   PImage imgThoughtBubble;
   PImage imgStars;
-  PImage imgHeart;
+  PImage gameOverScreen;
   int intScreen = 0;
 
   // Load Images of pizza toppings
@@ -56,6 +38,13 @@ public class Sketch extends PApplet {
   PImage imgPineapple;
   PImage imgSause;
 
+  // Gallery Images + Varables
+  PImage imgGallery1;
+  PImage imgGallery2;
+  PImage imgGallery3;
+  PImage imgLeftOrRight;
+  int galleryPage = 0;
+
   // Ingredient variables 
   int xPizzaValue = 320;
   boolean movePizzaRight = false;
@@ -68,6 +57,9 @@ public class Sketch extends PApplet {
   float[] fruitinCabinateX = new float[8];
   float[] fruitinCabinateY = new float[8];
   int notePadNumber = 0;
+  boolean[] hideIngredient = new boolean[8];
+  int currentIngredientIndex = 0;
+  boolean[] collectedIngredients = new boolean[8];
 
   // Which customer was picked?
   boolean Character1picked = false;
@@ -81,10 +73,6 @@ public class Sketch extends PApplet {
   boolean displayPauseScreen = false;
   boolean dipslayKitchen = false;
 
-  // Count down variables
-  int timerMIN = 0;
-  int timerSEC = 0;
-
   // Level Variables
   boolean level1 = false;
   boolean level2 = false;
@@ -92,10 +80,21 @@ public class Sketch extends PApplet {
 
   // Lives variables 
   int numberOfLives = 5;
+  PImage[] drawHearts = new PImage[5];
 
   // Star varibale
   boolean drawStars;
   float timeSinceStars = 0;
+
+  // Timer variables
+  int rectLength = 120;
+  int startTimer1;
+
+  // Lose Screen Variables
+  boolean outOfTime = false;
+
+  // Other variables
+  boolean isNotepadVisible = false;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -117,6 +116,7 @@ public class Sketch extends PApplet {
     // Load Images 
     loadImages();
     loadIngredients();
+    loadGalleryImages();
 
     // Determine the x-values for all fo the fruits
     for (int i = 0; i < xValueOfFruits.length; i++){
@@ -159,6 +159,14 @@ public class Sketch extends PApplet {
         }
         order1[i] = randomNumber;
     }
+
+    // Set all ingredient hide statuses to false 
+    for (int i = 0; i < hideIngredient.length; i++){
+      hideIngredient[i] = false;
+    }
+
+    // Set start timer1
+    startTimer1 = millis();
   }
 
   /**
@@ -166,27 +174,48 @@ public class Sketch extends PApplet {
    */
   public void draw() {
     
+    // Display welcome screen 
     if(intScreen == 0){
       welcomeScreen();
     }
+
+    // Display take order screen
     if (intScreen == 1){
       takeOrder();
     }
 
+    // Display pause screen
     if (displayPauseScreen){
       pauseScreen();
     }
 
-    if (level1){  
-      lives();
+    // Player on level 1
+    if (level1 && !outOfTime){  
       if (dipslayKitchen){
         kitchen();
-      }
-      timer1();  
+      } 
+      timer1(); 
+      lives();
     }
 
+    // Did the player collect the right ingredient?
     if (drawStars){
       image(imgStars, xPizzaValue, 380);
+    }
+
+    // What page of the gallery is the player on?
+    if (galleryPage == 1){
+      gallery1();
+    }
+    else if (galleryPage == 2){
+      gallery2();
+    }
+    else if (galleryPage == 3){
+      gallery3();
+    }
+
+    if (numberOfLives == 0 || outOfTime){
+      youLose();
     }
 
   }
@@ -258,8 +287,17 @@ public class Sketch extends PApplet {
     imgStars.resize(200, 150);
 
     // Load heart
-    imgHeart = loadImage("/Images/heart.png");
-    imgHeart.resize(100, 90);
+    for (int i = 0; i < drawHearts.length; i++){
+      drawHearts[i] = loadImage("/Images/heart.png");
+      drawHearts[i].resize(100, 90);
+    }
+
+    // Load game over screen
+    gameOverScreen = loadImage("/Images/gameOver.png");
+    gameOverScreen.resize(850, 500);
+
+    // Load tutorial screen 
+
   }
 
   public void loadIngredients(){
@@ -298,8 +336,19 @@ public class Sketch extends PApplet {
     }
   }
 
-  public void loadGalleryItems(){
+  public void loadGalleryImages(){
 
+    imgGallery1 = loadImage("/GalleryPics/Gallery1.png");
+    imgGallery1.resize(850, 500);
+
+    imgGallery2 = loadImage("/GalleryPics/Gallery2.png");
+    imgGallery2.resize(850, 500);
+
+    imgGallery3 = loadImage("/GalleryPics/Gallery3.png");
+    imgGallery3.resize(850, 500);
+
+    imgLeftOrRight = loadImage("/GalleryPics/leftright buttons.png");
+    imgLeftOrRight.resize(120, 100);
   }
   
   public void welcomeScreen(){
@@ -311,7 +360,7 @@ public class Sketch extends PApplet {
     image(imgGallery, 150, 385);
     image(imgBy, 50, 470);
   }
-
+// NEEDS WORK
   public void pauseScreen(){
     background(imgExterior);
     image(imgLogo, 150, 80);
@@ -328,9 +377,11 @@ public class Sketch extends PApplet {
     // Bring out notepad
     if (mouseX <= 60 && mouseY >= 150){
       image(imgnotePad, -75, 125);
+      isNotepadVisible = true;
     }
     else{
       image(imgnotePad, -250, 125);
+      isNotepadVisible = false;
     }
 
     // Draw logo
@@ -341,6 +392,7 @@ public class Sketch extends PApplet {
       image(drawIngredientImages[i], fruitinCabinateX[i], fruitinCabinateY[i]);
     }
 
+    // If character 1 is picked...
     if (Character1picked){
       level1 = true;
       image(imgThoughtBubble, 450, 20);
@@ -348,8 +400,39 @@ public class Sketch extends PApplet {
         image(drawIngredientImages[(int)order1[i]], 505 + i * 50, 55);
       }
     }
+
+    if (Character2picked){
+      level2 = true;
+      //image(imgThoughtBubble, )
+    }
+    /*
+    // Display collected ingredients on the notepad
+    if (isNotepadVisible){
+      displayCollectedIngredientsOnNotepad(-75);
+    } 
+    else {
+      displayCollectedIngredientsOnNotepad(-250);
+    }
+    */
+  }
+/*
+  public void displayCollectedIngredientsOnNotepad(int notePadX){
+    int baseY = 200;
+    int spacebetweenIngredients = 40;
+
+    for (int i = 0; i < collectedIngredients.length; i++){
+      if (collectedIngredients[i]){
+        image(drawIngredientImages[i], (float)notePadX + 50, baseY + i * spacebetweenIngredients);
+      }
+    }
   }
 
+  public void collectedIngredients(int index){
+      if (index >= 0 && index < collectedIngredients.length) {
+        collectedIngredients[index] = true;
+      }
+  }
+    */
   public void kitchen(){
     background(imgKitchen);
     image(imgPizzaCrust, xPizzaValue, 420); 
@@ -366,7 +449,12 @@ public class Sketch extends PApplet {
 
     // Determine the x-values for all of fruits if they go off screen
     for (int i = 0; i < drawIngredientImages.length; i++){
-      if (yValueOfFruits[i] > height){
+      if (yValueOfFruits[i] > height && !hideIngredient[i]){
+        yValueOfFruits[i] = 0;
+        speedOfFruits[i] =  (float)random(4);
+        xValueOfFruits[i] = random(width);
+      }
+      else if (yValueOfFruits[i] > height && hideIngredient[i]){
         yValueOfFruits[i] = 0;
         speedOfFruits[i] =  (float)random(4);
         xValueOfFruits[i] = random(width);
@@ -379,36 +467,77 @@ public class Sketch extends PApplet {
       image(drawIngredientImages[i], xValueOfFruits[i], yValueOfFruits[i]);
     }
 
-    // Collision detection + draw Stars
-    for (int i = 0; i < drawIngredientImages.length; i++){
-      if (xValueOfFruits[i] + 60 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 330 && yValueOfFruits[i] + 70 > 430){
-        yValueOfFruits[i] = height + 100;
-        timeSinceStars = millis();
-        drawStars = true;
-      }
-      // do if it is not what we had planed 
-      if (drawStars && millis() >= timeSinceStars + 1000){
-        drawStars = false;
-      }
+    // Collision detection + draw Stars or minus lives
+    for (int i = 0; i < drawIngredientImages.length; i++) {
+      if (xValueOfFruits[i] + 45 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 315 && yValueOfFruits[i] + 70 > 430) {
+        if (drawIngredientImages[(int) order1[currentIngredientIndex]] == drawIngredientImages[i]) {
+          yValueOfFruits[i] = height + 100;
+          timeSinceStars = millis();
+          drawStars = true;
+          currentIngredientIndex++;
+        } else {
+          yValueOfFruits[i] = height + 100;
+          numberOfLives--;
+          drawHearts[numberOfLives] = null;
+          if (numberOfLives == 0) {
+            outOfTime = true;
+            youLose();
+          }
+        }
+      }    
+
+    // Draw stars 
+    if (drawStars && millis() >= timeSinceStars + 1000) {
+      drawStars = false;
+    }
+    
+    if (drawStars && millis() >= timeSinceStars + 1000){
+      drawStars = false;
     }
   }
-
-  public void gallery(){
-   // image();
   }
 
-// NEEDS WORK
+  public void gallery1(){
+    image(imgGallery1, 0, 0);
+    image(imgLeftOrRight, 400, 440);
+  }
+
+  public void gallery2(){
+    image(imgGallery2, 0, 0);
+    image(imgLeftOrRight, 400, 440);
+  }
+
+  public void gallery3(){
+    image(imgGallery3, 0, 0);
+    image(imgLeftOrRight, 400, 440);
+  }
+  
   public void lives(){
-    if (numberOfLives == 5){
-      for (int i = 0; i < numberOfLives; i ++){
-        image(imgHeart, 35 + (i * 40), 25);
-      }
+  for (int i = 0; i < numberOfLives; i++) {
+        if (drawHearts[i] != null) {
+            image(drawHearts[i], 35 + (i * 40), 25);
+        }
     }
   }
-// NEEDS TO BE DONE
+
   public void timer1(){
-    text(timerMIN, 60, 90);
-    //text(timerSEC, )
+    rect(700, 20, 120, 20);
+    fill(113, 171, 139);
+    rect(700, 20, rectLength, 20);
+    fill(0, 0, 0);
+    
+    int elpasedTime = (millis() - startTimer1) / 1000;
+    rectLength = 120 - elpasedTime;
+  
+    if (rectLength <= 0) {
+      outOfTime = true;
+      rectLength = 0;
+      youLose();
+    }
+  }
+
+  public void youLose(){
+    image(gameOverScreen, 0, 0);
   }
 
   public boolean isInTheArray(float ingredients){
@@ -438,15 +567,41 @@ public class Sketch extends PApplet {
     // Was start button pressed?
     if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 300){
       intScreen = 1;
-      timerMIN = minute();
-      timerSEC = second();
     }
 
-    // Was the first Character clicked?
+    // Was the first Character selected?
     if (mouseX >= 325 && mouseX <= 450 && mouseY >= 99 && mouseY <= 265){
       Character1picked = true;
     }
-  }
+
+    // Was the second chracter selected?
+    if (mouseX >= 480 && mouseX <= 550 && mouseY >= 99 && mouseY <= 265){
+      Character2picked = true;
+      System.out.println("Hello");
+    }
+
+    // Was the gallery button pressed?
+    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 350 && mouseY <= 480){
+      galleryPage = 1;
+    }
+
+    // Which gallery screen should be shown?
+    if (galleryPage == 1 && mouseX >= 400 && mouseX <= 460 && mouseY >= 440 && mouseY <= 490){
+      galleryPage = 2;
+    }
+    
+    if (galleryPage == 2 && mouseX >= 400 && mouseX <= 460 && mouseY >= 440 && mouseY <= 490){
+      galleryPage = 3;
+    }
+
+    // Did you move the ingredient off of the screen 
+    for (int i = 0; i < drawIngredientImages.length; i++){
+      if (dist(mouseX, mouseY, xValueOfFruits[i], yValueOfFruits[i]) < 60){
+        hideIngredient[i] = true;
+      }
+    }
+    
+    }
 
   public void keyPressed(){
     if (key == 'x'){
@@ -460,6 +615,22 @@ public class Sketch extends PApplet {
     }
     if (dipslayKitchen && keyCode == LEFT){
       movePizzaLeft = true;
+    }
+
+    // Which gallery page should be displayed?
+    if (galleryPage == 1 && keyCode == RIGHT){
+      galleryPage = 2;
+    }
+
+    if (galleryPage == 2 && keyCode == RIGHT){
+      galleryPage = 3;
+    }
+    else if (galleryPage == 2 && keyCode == LEFT){
+      galleryPage = 1;
+    }
+
+    if (galleryPage == 3 && keyCode == LEFT){
+      galleryPage = 2;
     }
   }
 
