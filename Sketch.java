@@ -33,6 +33,7 @@ public class Sketch extends PApplet {
   PImage imgWinScreen;
   PImage imgOptions;
   PImage imgChalkBoard;
+  PImage imgtutorialScreen;
   int intScreen = 0;
 
   // Load Images of pizza toppings
@@ -323,7 +324,7 @@ public class Sketch extends PApplet {
 
     // Load image of notepad 
     imgnotePad = loadImage("/Images/notePad.png");
-    imgnotePad.resize(400, 500);    
+    imgnotePad.resize(300, 400);    
 
     // Load image of Kitchen
     imgKitchen = loadImage("/Images/KitchenFull.png");
@@ -348,8 +349,8 @@ public class Sketch extends PApplet {
     gameOverScreen.resize(850, 500);
 
     // Load tutorial screen 
-    imgtutorial = loadImage("/Images/tutorial screen.png");
-    imgtutorial.resize(850, 500);
+    imgtutorialScreen = loadImage("/Images/tutorial screen.png");
+    imgtutorialScreen.resize(850, 500);
 
     // Load 3
     img3 = loadImage("/Images/3.png");
@@ -458,10 +459,10 @@ public class Sketch extends PApplet {
     image(imgCharacter2, 480, 80);
     image(imgCharacter3, 680, 85);
 
-    image(imgnotePad, -75, 125);
+    image(imgnotePad, 0, 125);
 
     // Draw logo
-    image(imgLogo, 40, 40);
+    image(imgLogo, 1, 40);
     
     // Put fruits in the cabinet
     for (int i = 0; i < drawIngredientImages.length; i++){
@@ -476,10 +477,8 @@ public class Sketch extends PApplet {
         image(drawIngredientImages[(int)order1[i]], 505 + i * 50, 55);
       }
     }
-
-    // Show fruit on notepad
-    if (isNotepadVisible)
-
+  
+    // If character 2 is picked
     if (Character2picked){
       level2 = true;
       image(imgThoughtBubble2, 250, 20);
@@ -495,6 +494,15 @@ public class Sketch extends PApplet {
         image(drawIngredientImages[(int)order1[i]], 510 + i * 50, 35);
       }
     }
+  }
+
+  public void miniKitchen(){
+
+  }
+
+  public void tutorial(){
+    image(imgtutorialScreen, 0, 0);
+    //if ()
   }
 
   public void keyPad(){
@@ -595,7 +603,7 @@ public class Sketch extends PApplet {
 
     // Collision detection + draw Stars or minus lives
     for (int i = 0; i < drawIngredientImages.length; i++) {
-      if (xValueOfFruits[i] + 45 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 315 && yValueOfFruits[i] + 70 > 430) {
+      if (xValueOfFruits[i] + 45 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 200 && yValueOfFruits[i] + 70 > 430) {
         if (drawIngredientImages[(int) order1[currentIngredientIndex]] == drawIngredientImages[i]) {
           yValueOfFruits[i] = height + 100;
           timeSinceStars = millis();
@@ -748,7 +756,7 @@ public class Sketch extends PApplet {
     }
 
     // Was the gallery button pressed?
-    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 350 && mouseY <= 480){
+    if (mouseX >= 150 && mouseX <= 400 && mouseY >= 380 && mouseY <= 480){
       galleryPage = 1;
     }
 
@@ -768,6 +776,11 @@ public class Sketch extends PApplet {
       } else if (galleryPage == 3) {
         galleryPage = 2;
       }
+    }
+
+    // Was the tutorial selected
+    if (mouseX > 150 && mouseX <= 400 && mouseY >= 310 && mouseY <= 370){
+      tutorial();
     }
     
    }   
