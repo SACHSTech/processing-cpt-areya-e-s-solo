@@ -29,6 +29,7 @@ When playing the Pizzalicious game, the goal is to take the order of the custome
               To get to the kitchen press the 'k' key
 
 `Limitations:` No music accompanies the game
+               The menu does not rest itself, the player must physically remove the old items
 
 ### Home Page
 ![drawing](HomePage.png)

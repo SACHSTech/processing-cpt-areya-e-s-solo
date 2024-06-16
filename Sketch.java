@@ -76,6 +76,8 @@ public class Sketch extends PApplet {
 
   // Order Variables
   float[] order1 = {9, 9, 9, 9};
+  float[] order2 = {9, 9, 9, 9};
+  float[] order3 = {9, 9, 9, 9};
   int num1;
   int num2;
   int num3;
@@ -131,9 +133,7 @@ public class Sketch extends PApplet {
   boolean showRemember = false;
   boolean showMiniTakeOrder = false;
   boolean ongoingtutorial = false;
-  int[] initialFruitinCabinateX = {290, 370, 290, 370, 520, 600, 520, 600};
-  int[] initialFruitinCabinateY = {360, 360, 435, 435, 360, 360, 435, 435};
-  boolean resetNeeded = false;
+  boolean showMiniYouWin = false;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -167,17 +167,61 @@ public class Sketch extends PApplet {
       speedOfFruits[i] = (float)random(5);
     }
     
+    // Set the x values of fruit in the take out order method
+    fruitinCabinateX[0] = 290;
+    fruitinCabinateX[1] = 370;
+    fruitinCabinateX[2] = 290;
+    fruitinCabinateX[3] = 370;
+    fruitinCabinateX[4] = 520;
+    fruitinCabinateX[5] = 600;
+    fruitinCabinateX[6] = 520;
+    fruitinCabinateX[7] = 600;
+
+    // Set the y values of fruit in the take out order method 
+    fruitinCabinateY[0] = 360;
+    fruitinCabinateY[1] = 360;
+    fruitinCabinateY[2] = 435;
+    fruitinCabinateY[3] = 435;
+    fruitinCabinateY[4] = 360;
+    fruitinCabinateY[5] = 360;
+    fruitinCabinateY[6] = 435;
+    fruitinCabinateY[7] = 435;
+    
     // Randomize the first order
-    float randomNumber = 0;
+    float randomNumber1 = 0;
     for (int i = 0; i < order1.length; i++){
         while (true){
-          randomNumber = myRandom.nextInt(8);
-          if (!isInTheArray(randomNumber)){
+          randomNumber1 = myRandom.nextInt(8);
+          if (!isInThe1stArray(randomNumber1)){
             break;
           }
         }
-        order1[i] = randomNumber;
+        order1[i] = randomNumber1;
     }
+
+    // Randomize the second order
+    float randomNumber2 = 0;
+    for (int i = 0; i < order2.length; i++){
+        while (true){
+          randomNumber2 = myRandom.nextInt(8);
+          if (!isInThe2ndArray(randomNumber2)){
+            break;
+          }
+        }
+        order2[i] = randomNumber2;
+    }
+
+    // Randomize the second order
+    float randomNumber3 = 0;
+    for (int i = 0; i < order3.length; i++){
+        while (true){
+          randomNumber3 = myRandom.nextInt(8);
+          if (!isInThe3rdArray(randomNumber3)){
+            break;
+          }
+        }
+        order3[i] = randomNumber3;
+    }    
 
     // Set randomized numbers for math euqation
     num1 = myRandom.nextInt(5);
@@ -282,7 +326,8 @@ public class Sketch extends PApplet {
     else if (onMiniKitchen){
       miniKitchen();
     }
-    else if (miniCollision){
+    
+    if (showMiniYouWin){
       miniYouWin();
     }
 
@@ -500,12 +545,6 @@ public class Sketch extends PApplet {
    * Displays an order station when called upon and utalizes user input
    */
   public void takeOrder(){ 
-    if (resetNeeded) {
-      resetIngredientPositions();
-      resetNeeded = false;
-  }
-
-    // Draw the Background and characters
     image(imgOrderStation, 0, 0);
     image(imgCharacter1, 325, 99);
     textSize(30);
@@ -544,8 +583,8 @@ public class Sketch extends PApplet {
       timeSinceStars = millis();
       level2 = true;
       image(imgThoughtBubble2, 250, 20);
-      for (int i = 0; i < order1.length; i++){
-        image(drawIngredientImages[(int)order1[i]], 310 + i * 50, 35);
+      for (int i = 0; i < order2.length; i++){
+        image(drawIngredientImages[(int)order2[i]], 310 + i * 50, 35);
       }
     }
 
@@ -624,12 +663,34 @@ public class Sketch extends PApplet {
       countDown();
     }
 
-    // Draw the needed ingredients
-    fill(161, 159, 159);
-    rect(0, 100, 70, 265);
-    for (int i = 0 ; i < order1.length; i++){
-      fill(135, 132, 122);
-      image(drawIngredientImages[(int)order1[i]], 5, 100 + (i * 65));
+    if (Character1picked){
+      // Draw the needed ingredients
+      fill(161, 159, 159);
+      rect(0, 100, 70, 265);
+      for (int i = 0 ; i < order1.length; i++){
+        fill(135, 132, 122);
+        image(drawIngredientImages[(int)order1[i]], 5, 100 + (i * 65));
+      }
+    }
+
+    if (Character2picked){
+      // Draw the needed ingredients
+      fill(161, 159, 159);
+      rect(0, 100, 70, 265);
+      for (int i = 0 ; i < order2.length; i++){
+        fill(135, 132, 122);
+        image(drawIngredientImages[(int)order2[i]], 5, 100 + (i * 65));
+      }
+    }
+
+    if (Character3picked){
+      // Draw the needed ingredients
+      fill(161, 159, 159);
+      rect(0, 100, 70, 265);
+      for (int i = 0 ; i < order3.length; i++){
+        fill(135, 132, 122);
+        image(drawIngredientImages[(int)order3[i]], 5, 100 + (i * 65));
+      }
     }
 
     // Should I move the pizza
@@ -670,7 +731,6 @@ public class Sketch extends PApplet {
         } else {
           yValueOfFruits[i] = height + 100;
           numberOfLives--;
-          drawHearts[numberOfLives] = null;
           if (numberOfLives == 0) {
             outOfTime = true;
             youLose();
@@ -818,13 +878,14 @@ public class Sketch extends PApplet {
       yValueOfFruits[i] += speedOfFruits[i];
       image(drawIngredientImages[i], xValueOfFruits[i], yValueOfFruits[i]);
     }
+
     // Collision detection + draw Stars or minus lives
-    for (int i = 0; i < drawIngredientImages.length; i++){
-      if ((xValueOfFruits[i] + 30 > xPizzaValue || xValueOfFruits[0] < xPizzaValue + 200) && yValueOfFruits[0] + 70 > 430) {
-        onMiniKitchen = false;
-        miniCollision = true;
-        break;
-      }    
+    for (int i = 0; i < drawIngredientImages.length; i++) {
+      if (xValueOfFruits[i] + 30 > xPizzaValue && xValueOfFruits[i] < xPizzaValue + 150 && yValueOfFruits[i] + 70 > 440) {
+          onMiniKitchen = false;
+          showMiniYouWin = true;
+          break;
+      }          
     }
 
     // Determine the x-values for all of fruits if they go off screen
@@ -930,7 +991,7 @@ public class Sketch extends PApplet {
    * @param ingredients Intakes the ingredient requested
    * @return if the ingredient is already called upon or not
    */
-  public boolean isInTheArray(float ingredients){
+  public boolean isInThe1stArray(float ingredients){
     for (int i = 0; i < order1.length; i++){
       if (order1[i] == ingredients){
         return true;
@@ -938,17 +999,25 @@ public class Sketch extends PApplet {
     }
     return false;
   }
-  
-  /**
-   * 
-   */
-  public void resetIngredientPositions() {
-    for (int i = 0; i < fruitinCabinateX.length; i++) {
-        fruitinCabinateX[i] = initialFruitinCabinateX[i];
-        fruitinCabinateY[i] = initialFruitinCabinateY[i];
-    }
-}
 
+  public boolean isInThe2ndArray(float ingredients){
+    for (int i = 0; i < order1.length; i++){
+      if (order2[i] == ingredients){
+        return true;
+      }
+    }
+    return false;
+    }
+
+  public boolean isInThe3rdArray(float ingredients){
+    for (int i = 0; i < order1.length; i++){
+      if (order2[i] == ingredients){
+        return true;
+      }
+    }
+    return false;
+    }
+  
   /**
    * Does a certain funciton of the mouse is dragged
    */
@@ -1060,6 +1129,7 @@ public class Sketch extends PApplet {
       level2 = false;
       level3 = false;
       gameWon = false;
+      showMiniYouWin = false;
       tutorialPage = 0;
       numberOfLives = 5; 
       outOfTime = false;
@@ -1077,6 +1147,7 @@ public class Sketch extends PApplet {
       dipslayKitchen = false;
       showMiniTakeOrder = false;
       showTutorial = false;
+      showMiniYouWin = false;
       miniCollision  = false;
       onMiniKitchen = false;
       mathAnswered = true;
@@ -1092,6 +1163,7 @@ public class Sketch extends PApplet {
       level1 = false;
       level2 = false;
       level3 = false;
+      numberOfLives = 5;
       tutorialPage = 0;
       if (numberOfLives == 0 || outOfTime){
         numberOfLives = 5; 
@@ -1177,7 +1249,7 @@ public class Sketch extends PApplet {
   }
 
   /**
-   * Takes in a string inputted by the user 
+   * Takes in a string inputted by the usser
    */
   public void keyTyped(){
     if (key != CODED && !mathAnswered){
