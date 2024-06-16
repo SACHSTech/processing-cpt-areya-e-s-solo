@@ -58,6 +58,7 @@ public class Sketch extends PApplet {
 
   // Ingredient variables 
   int xPizzaValue = 320;
+  int currentIngredientIndex = 0;
   boolean movePizzaRight = false;
   boolean movePizzaLeft = false;
   PImage[] drawIngredientImages = new PImage[8];
@@ -67,8 +68,6 @@ public class Sketch extends PApplet {
   float [] speedOfFruits = new float[8];
   float[] fruitinCabinateX = new float[8];
   float[] fruitinCabinateY = new float[8];
-  int currentIngredientIndex = 0;
-  boolean[] collectedIngredients = new boolean[8];
 
   // Which customer was picked?
   boolean Character1picked = false;
@@ -77,6 +76,9 @@ public class Sketch extends PApplet {
 
   // Order Variables
   float[] order1 = {9, 9, 9, 9};
+  int num1;
+  int num2;
+  int num3;
 
   // Which screen is being shown?
   boolean dipslayKitchen = false;
@@ -105,36 +107,33 @@ public class Sketch extends PApplet {
   boolean outOfTime = false;
   boolean gameWon = false;
 
-  // Other variables
-  boolean isNotepadVisible = false;
+  // Math variables
   boolean mathAnswered = false;
-  int num1;
-  int num2;
-  int num3;
   String userMathInput = "";
   int checkMarkStartTime = 0;
   int checkMarkDuration = 200;
   boolean showCheckMark = false;
   boolean showX = false;
-  int tutorialPage = 0;
   int xStartTime = 2000;
+  boolean checkMath = false;
+  int answer = 0;
+
+  // Tutoiral variable
+  int tutorialPage = 0;
   boolean showTutorial = false;
-  boolean checkMath;
-  boolean fallingCheese = false;
   boolean characterSelected = false;
-  boolean pizzaMoved = false;
   boolean onMiniKitchen = false;
-  int answer;
   boolean displayTakeOrder = false;
   boolean displayWelcomeScreen = true;
   int pauseScreenStartTime = 0;
-  int cheeseY = 0;
-  boolean miniCollision;
-  int elpasedTime;
-  boolean showTakeOrderpt2 = false;
+  boolean miniCollision = false;
+  int elpasedTime = 0;
   boolean showRemember = false;
   boolean showMiniTakeOrder = false;
   boolean ongoingtutorial = false;
+  int[] initialFruitinCabinateX = {290, 370, 290, 370, 520, 600, 520, 600};
+  int[] initialFruitinCabinateY = {360, 360, 435, 435, 360, 360, 435, 435};
+  boolean resetNeeded = false;
 	
   /**
    * Called once at the beginning of execution, put your size all in this method
@@ -145,8 +144,8 @@ public class Sketch extends PApplet {
   }
 
   /** 
-   * Called once at the beginning of execution.  Add initial set up
-   * values here i.e background, stroke, fill etc.
+   * Called once at the beginning of execution.
+   * Initalizes preset values
    */
   public void setup() {
 
@@ -158,36 +157,16 @@ public class Sketch extends PApplet {
     loadIngredients();
     loadGalleryImages();
 
-    // Determine the x-values for all fo the fruits
+    // Determine the x-values for all of the falling fruits
     for (int i = 0; i < xValueOfFruits.length; i++){
       xValueOfFruits[i] = random(width);
     }
 
-    // Determine how fast each fruit will fall
+    // Determine the speed at which each fruit will fall
     for (int i = 0; i < speedOfFruits.length; i++){
       speedOfFruits[i] = (float)random(5);
     }
     
-    // Set the x values of fruit in the take out order method
-    fruitinCabinateX[0] = 290;
-    fruitinCabinateX[1] = 370;
-    fruitinCabinateX[2] = 290;
-    fruitinCabinateX[3] = 370;
-    fruitinCabinateX[4] = 520;
-    fruitinCabinateX[5] = 600;
-    fruitinCabinateX[6] = 520;
-    fruitinCabinateX[7] = 600;
-
-    // Set the y values of fruit in the take out order method 
-    fruitinCabinateY[0] = 360;
-    fruitinCabinateY[1] = 360;
-    fruitinCabinateY[2] = 435;
-    fruitinCabinateY[3] = 435;
-    fruitinCabinateY[4] = 360;
-    fruitinCabinateY[5] = 360;
-    fruitinCabinateY[6] = 435;
-    fruitinCabinateY[7] = 435;
-
     // Randomize the first order
     float randomNumber = 0;
     for (int i = 0; i < order1.length; i++){
@@ -255,7 +234,7 @@ public class Sketch extends PApplet {
       lives();
     }
 
-    // Show checkmark or x 
+    // Show checkmark or 'x' 
     if (showCheckMark) {
       drawCheckMark();
       if (millis() - checkMarkStartTime > checkMarkDuration) {
@@ -289,27 +268,21 @@ public class Sketch extends PApplet {
 
     // What page of the tutorial is the player on?
     if (showTutorial){
-      System.out.println("show tutorial");
       tutorial();
     }
     else if (showRemember){
-      System.out.println("show remember = true");
       remember();
     }
     else if (showMiniTakeOrder){
-      System.out.println("showminitakeorder = true");
       miniTakeOrder();
     }
     else if (characterSelected){
-      System.out.println("character selected");
       miniTakeOrderpt2();
     }
     else if (onMiniKitchen){
-      System.out.println("onMiniKitchen = true");
       miniKitchen();
     }
     else if (miniCollision){
-      System.out.println("mini you win");
       miniYouWin();
     }
 
@@ -323,10 +296,14 @@ public class Sketch extends PApplet {
       youLose();
     }
 
+    // Show the navigation bar
     image(imgOptions, 800, 390);
 
   }
-
+  
+  /**
+   * Loads images needed to run the program
+   */
   public void loadImages(){
     
     // Load Exterior of Dinner
@@ -448,6 +425,9 @@ public class Sketch extends PApplet {
     imgRemember.resize(850, 500);
   }
 
+  /**
+   * Loads images (of ingredients) needed to run the program 
+   */
   public void loadIngredients(){
 
     // Load image of pizza crust 
@@ -485,6 +465,9 @@ public class Sketch extends PApplet {
 
   }
 
+  /**
+   * Loads images needed to run the program 
+   */
   public void loadGalleryImages(){
 
     imgGallery1 = loadImage("/GalleryPics/Gallery1.png");
@@ -500,6 +483,9 @@ public class Sketch extends PApplet {
     imgLeftOrRight.resize(120, 100);
   }
   
+  /**
+   * Displays a welcome screen when called upon and utalizes user input
+   */
   public void welcomeScreen(){
     background(imgExterior);
     image(imgWelcome, 100, 45);
@@ -510,7 +496,16 @@ public class Sketch extends PApplet {
     image(imgBy, 50, 470);
   }
 
-  public void takeOrder(){
+  /**
+   * Displays an order station when called upon and utalizes user input
+   */
+  public void takeOrder(){ 
+    if (resetNeeded) {
+      resetIngredientPositions();
+      resetNeeded = false;
+  }
+
+    // Draw the Background and characters
     image(imgOrderStation, 0, 0);
     image(imgCharacter1, 325, 99);
     textSize(30);
@@ -564,6 +559,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Displays a math problem when called upon
+   */
   public void keyPad(){
     image(imgChalkBoard, 0, 0);
     textSize(100);
@@ -580,17 +578,17 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Verifies that math input from user is equivalent to the computed answer 
+   */
   public void checkMath(){
     answer = num1 * num2 + num3;
-    System.out.println("Computed Answer: " + answer);
     String strAnswer = "" + answer;
-    System.out.println("String Answer: " + strAnswer);
-    System.out.println("User Input: " + userMathInput);
     if(userMathInput != null && userMathInput.trim().equals(strAnswer.trim())){
       checkMarkStartTime = millis();
       showCheckMark = true;
       showX = false;
-      //mathAnswered = true;
+      mathAnswered = true;
     }
     else {
       xStartTime = millis();
@@ -600,14 +598,23 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Draws a check mark when called upon for a certain period of time
+   */
   public void drawCheckMark(){
     image(imgCheckMark, 550, 250);
   }
 
+  /**
+   * Draws an 'x' mark when called upon for a certain period of time
+   */
   public void drawX(){
     image(imgX, 550, 250);
   }
 
+  /**
+   * Displays a kitchen when called upon and utalizes user input 
+   */
   public void kitchen(){
     background(imgKitchen);
     image(imgPizzaCrust, xPizzaValue, 420); 
@@ -663,7 +670,6 @@ public class Sketch extends PApplet {
         } else {
           yValueOfFruits[i] = height + 100;
           numberOfLives--;
-          System.out.println("lost a life");
           drawHearts[numberOfLives] = null;
           if (numberOfLives == 0) {
             outOfTime = true;
@@ -684,10 +690,14 @@ public class Sketch extends PApplet {
 
     if (currentIngredientIndex >= order1.length){
       gameWon = true;
+      numberOfLives = 5;
     }
     }
   }
 
+  /**
+   * Displays a cout down scren (counts down from 3) when called upon 
+   */
   public void countDown(){
     if (!countdownStarted){
       startCountDown = millis();
@@ -716,13 +726,20 @@ public class Sketch extends PApplet {
 
   }
   
+  /**
+   * Displays the tutorial home scren when called upon
+   */
   public void tutorial(){
     if (tutorialPage == 0){
+      miniCollision = false;
       ongoingtutorial = true;
       image(imgtutorialScreen, 0, 0);
     }
   }
 
+  /**
+   * Displays a take order screen that can only be accessed trough the tutorial 
+   */
   public void miniTakeOrder(){
     image(imgOrderStation, 0, 0);
     image(imgCharacter1, 325, 99);
@@ -735,7 +752,7 @@ public class Sketch extends PApplet {
     text("RECIPE", 10, 100);
     image(imgnotePad, 0, 125);    
 
-    text("Click on the chracter", 20, 40);
+    text("Click on the character", 20, 40);
     
     // Put the ingredients in the cabinets
     for (int i = 0; i < drawIngredientImages.length; i++){
@@ -743,6 +760,9 @@ public class Sketch extends PApplet {
     } 
   }
 
+  /**
+   * Displays another take order screen that can only be accessed through the tutorial
+   */
   public void miniTakeOrderpt2(){
     image(imgOrderStation, 0, 0);
     image(imgCharacter1, 325, 99);
@@ -767,6 +787,9 @@ public class Sketch extends PApplet {
     }     
   }
   
+  /**
+   * Displays a kitchen screen that can only be accessed through the tutorial
+   */
   public void miniKitchen(){
         
     background(imgKitchen);
@@ -798,10 +821,8 @@ public class Sketch extends PApplet {
     // Collision detection + draw Stars or minus lives
     for (int i = 0; i < drawIngredientImages.length; i++){
       if ((xValueOfFruits[i] + 30 > xPizzaValue || xValueOfFruits[0] < xPizzaValue + 200) && yValueOfFruits[0] + 70 > 430) {
-        System.out.println("hit");
         onMiniKitchen = false;
         miniCollision = true;
-        System.out.println("mini collision = true");
         break;
       }    
     }
@@ -816,6 +837,9 @@ public class Sketch extends PApplet {
     }        
   }
 
+  /**
+   * Displays a youWin screen that can only be accessed through the tutoiral 
+   */
   public void miniYouWin(){
     image(imgWinScreen, 0, 0);
     textSize(30);
@@ -824,25 +848,40 @@ public class Sketch extends PApplet {
     text("you will see this: ",25, 60);
   }
 
+  /**
+   * Displays a reminder screen that can only be accessed through the tutorial
+   */
   public void remember(){
     image(imgRemember, 0, 0);
   }
 
+  /**
+   * Displays the first page of the gallery 
+   */
   public void gallery1(){
     image(imgGallery1, 0, 0);
     image(imgLeftOrRight, 400, 440);
   }
 
+  /***
+   * Displays the second page of the gallery 
+   */
   public void gallery2(){
     image(imgGallery2, 0, 0);
     image(imgLeftOrRight, 400, 440);
   }
 
+  /***
+   * Displays the third page of the gallery 
+   */
   public void gallery3(){
     image(imgGallery3, 0, 0);
     image(imgLeftOrRight, 400, 440);
   }
   
+  /***
+   * Displays the amount of remaning lives that the user has 
+   */
   public void lives(){
   for (int i = 0; i < numberOfLives; i++) {
         if (drawHearts[i] != null) {
@@ -851,6 +890,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /***
+   * Displays the amount of timer the player has left to complete a level 
+   */
   public void timer1(){
     rect(700, 20, 120, 20);
     fill(113, 171, 139);
@@ -867,14 +909,27 @@ public class Sketch extends PApplet {
     }
   }
 
+  /***
+   * Displays a 'you lose' screen if the player runs out of timer or loses all of their lives 
+   */
   public void youLose(){
     image(gameOverScreen, 0, 0);
   }
 
+  /***
+   * Displays a you win screen if the user successful completes a level
+   */
   public void youWin(){
     image(imgWinScreen, 0, 0);;
   } 
 
+  /***
+   * 
+   * Ensures that ingredients requested by the character are not duplicated
+   * 
+   * @param ingredients Intakes the ingredient requested
+   * @return if the ingredient is already called upon or not
+   */
   public boolean isInTheArray(float ingredients){
     for (int i = 0; i < order1.length; i++){
       if (order1[i] == ingredients){
@@ -884,6 +939,19 @@ public class Sketch extends PApplet {
     return false;
   }
   
+  /**
+   * 
+   */
+  public void resetIngredientPositions() {
+    for (int i = 0; i < fruitinCabinateX.length; i++) {
+        fruitinCabinateX[i] = initialFruitinCabinateX[i];
+        fruitinCabinateY[i] = initialFruitinCabinateY[i];
+    }
+}
+
+  /**
+   * Does a certain funciton of the mouse is dragged
+   */
   public void mouseDragged(){
     for (int i = 0; i < drawIngredientImages.length; i++){
       if (mouseX >= fruitinCabinateX[i] && mouseX <= fruitinCabinateX[i] + 55 && mouseY >= fruitinCabinateY[i] && mouseY <= fruitinCabinateY[i] + 70){
@@ -893,6 +961,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Does a certain function/action if a certain part of the screen is clicked on
+   */
   public void mouseClicked(){
     // Was start button pressed?
     if (mouseX >= 150 && mouseX <= 400 && mouseY >= 225 && mouseY <= 300){
@@ -952,7 +1023,6 @@ public class Sketch extends PApplet {
     // Was the first Character selected on the tutorial screen?
     if (mouseX >= 325 && mouseX <= 450 && mouseY >= 99 && mouseY <= 265 && ongoingtutorial){
     tutorialPage = 0;
-    System.out.println("chracterSelected");
     showMiniTakeOrder = false;
     characterSelected = true;
     }
@@ -967,7 +1037,6 @@ public class Sketch extends PApplet {
 
     // Collision for home screen on options image
     if (mouseX >= 800 && mouseY >= 424 && mouseY <= 460) {
-      System.out.println("home");
       displayWelcomeScreen = true;
       characterSelected = false;
       Character1picked = false;
@@ -999,7 +1068,6 @@ public class Sketch extends PApplet {
 
     // Collision for take order on optioons image
     if (mouseX >= 800 && mouseY >= 465 && mouseY <= height) {
-      System.out.println("take order");
       displayTakeOrder = true;
       displayWelcomeScreen = true;
       characterSelected = false;
@@ -1009,6 +1077,7 @@ public class Sketch extends PApplet {
       dipslayKitchen = false;
       showMiniTakeOrder = false;
       showTutorial = false;
+      miniCollision  = false;
       onMiniKitchen = false;
       mathAnswered = true;
       mathAnswered = false;
@@ -1033,6 +1102,9 @@ public class Sketch extends PApplet {
     
    }   
 
+   /**
+    * Does a certain function/action if a certain key is clicked on
+    */
   public void keyPressed(){
     if(key == 'k'){
       dipslayKitchen = true;
@@ -1069,13 +1141,11 @@ public class Sketch extends PApplet {
     }
 
     if (showTutorial && keyCode == UP){
-      System.out.println("Transitioning from Tutorial to Remember");
       showTutorial = false;
       showRemember = true;
       showMiniTakeOrder = false;
     }
     else if (showRemember && keyCode == UP){
-      System.out.println("Transitioning from Remember to MiniTakeOrder");
       showRemember = false;
       showMiniTakeOrder = true;
     }
@@ -1094,6 +1164,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Stops a certain function/action from continuing if a certain key is clicked on 
+   */
   public void keyReleased(){
     if (keyCode == RIGHT){
       movePizzaRight = false;
@@ -1103,6 +1176,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * Takes in a string inputted by the user 
+   */
   public void keyTyped(){
     if (key != CODED && !mathAnswered){
       userMathInput += key;
