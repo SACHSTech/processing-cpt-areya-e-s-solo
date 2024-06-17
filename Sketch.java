@@ -37,17 +37,11 @@ public class Sketch extends PApplet {
   PImage imgtutorialScreen;
 
   // Load Images of pizza toppings
-  PImage imgBasil;
   PImage imgPizzaCrust;
-  PImage imgCheese;
-  PImage imgMushroom;
-  PImage imgOlives;
-  PImage imgPepers;
-  PImage imgPepperoni;
-  PImage imgPineapple;
   PImage imgCheckMark;
+  PImage[] drawIngredientImages = new PImage[8];
+  PImage[] drawThoughts = new PImage[8];
   PImage imgX;
-  PImage imgSause;
 
   // Gallery Images + Varables
   PImage imgGallery1;
@@ -61,8 +55,6 @@ public class Sketch extends PApplet {
   int currentIngredientIndex = 0;
   boolean movePizzaRight = false;
   boolean movePizzaLeft = false;
-  PImage[] drawIngredientImages = new PImage[8];
-  PImage[] drawThoughts = new PImage[8];
   float[] xValueOfFruits = new float[8];
   float[] yValueOfFruits = new float[8];
   float [] speedOfFruits = new float[8];
@@ -580,7 +572,6 @@ public class Sketch extends PApplet {
   
     // If character 2 is picked
     if (Character2picked){
-      timeSinceStars = millis();
       level2 = true;
       image(imgThoughtBubble2, 250, 20);
       for (int i = 0; i < order2.length; i++){
@@ -589,7 +580,6 @@ public class Sketch extends PApplet {
     }
 
     if (Character3picked){
-      timeSinceStars = millis();
       level3 = true;
       image(imgThoughtBubble2, 450, 20);
       for (int i = 0; i < order1.length; i++){
@@ -999,7 +989,14 @@ public class Sketch extends PApplet {
     }
     return false;
   }
-
+  
+  /***
+   * 
+   * Ensures that ingredients requested by the character are not duplicated
+   * 
+   * @param ingredients Intakes the ingredient requested
+   * @return if the ingredient is already called upon or not
+   */
   public boolean isInThe2ndArray(float ingredients){
     for (int i = 0; i < order1.length; i++){
       if (order2[i] == ingredients){
@@ -1009,6 +1006,13 @@ public class Sketch extends PApplet {
     return false;
     }
 
+    /***
+   * 
+   * Ensures that ingredients requested by the character are not duplicated
+   * 
+   * @param ingredients Intakes the ingredient requested
+   * @return if the ingredient is already called upon or not
+   */
   public boolean isInThe3rdArray(float ingredients){
     for (int i = 0; i < order1.length; i++){
       if (order2[i] == ingredients){
